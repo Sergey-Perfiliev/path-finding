@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte'
-	import { gridStore, setVisited } from '../store/gridStore'
+	import { dijkstra, getPath } from '../algorithms/dijkstra'
+	import { gridStore, setShortest, setVisited } from '../store/gridStore'
 	import Dropdown from './Dropdown.svelte'
 	import Node from './Node.svelte'
 
@@ -16,12 +17,29 @@
 	const START_POS = { col: 5, row: 5 }
 	const FINISH_POS = { col: 15, row: 5 }
 
-	const visualize = () => {
-		console.log('visualize: ', method)
+	const visualize = async () => {
+		const startNode = $gridStore[START_POS.row][START_POS.col]
+		const finishNode = $gridStore[FINISH_POS.row][FINISH_POS.col]
+
+		const visitedNodes = dijkstra($gridStore, startNode, finishNode)
+		for (let node of visitedNodes) {
+			const { row, col } = node
+
+			await new Promise((resolve) => setTimeout(resolve, 20))
+			setVisited(row, col)
+		}
+
+		const pathNodes = getPath(finishNode)
+		for (let node of pathNodes) {
+			const { row, col } = node
+
+			await new Promise((resolve) => setTimeout(resolve, 20))
+			setShortest(row, col)
+		}
 	}
 
 	const clearBoard = () => {
-		console.log('clearBoard')
+		initializeGrid()
 	}
 
 	const initializeGrid = () => {
@@ -34,8 +52,10 @@
 					row: rowIdx,
 					isStart: colIdx === START_POS.col && rowIdx === START_POS.row,
 					isEnd: colIdx === FINISH_POS.col && rowIdx === FINISH_POS.row,
+					isShortest: false,
 					distance: Infinity,
-					visited: false,
+					isVisited: false,
+					prevNode: null,
 				})
 			}
 			gridData.push(row)
@@ -44,15 +64,8 @@
 		$gridStore = gridData
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		initializeGrid()
-
-		for (let i = 0; i < ROWS; ++i) {
-			for (let j = 0; j < COLS; ++j) {
-				await new Promise((resolve) => setTimeout(resolve, 50))
-				setVisited(i, j)
-			}
-		}
 	})
 </script>
 

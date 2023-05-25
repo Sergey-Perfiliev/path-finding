@@ -4,12 +4,14 @@
 
 	export let isStart
 	export let isEnd
+	export let isShortest
+	export let isVisited
 
 	export let distance
-	export let visited
+	export let prevNode
 </script>
 
-<div class="node" class:isStart class:isEnd class:isVisited={visited} />
+<div class="node" class:isStart class:isEnd class:isVisited class:isShortest />
 
 <style>
 	.node {
@@ -19,16 +21,20 @@
 		border: 1px solid #ffffff;
 	}
 
-	.isStart {
-		background-color: #52b396;
+	.node.isStart {
+		background-color: #52b396 !important;
 	}
 
-	.isEnd {
-		background-color: #e6365b;
+	.node.isEnd {
+		background-color: #e6365b !important;
 	}
 
 	.isVisited {
 		animation: visitedAnimation 1s linear forwards;
+	}
+
+	.isShortest {
+		animation: pathAnimation 1s linear forwards;
 	}
 
 	@keyframes visitedAnimation {
@@ -38,6 +44,16 @@
 
 		to {
 			background-color: #a3c7fa;
+		}
+	}
+
+	@keyframes pathAnimation {
+		from {
+			background-color: #52b396;
+		}
+
+		to {
+			background-color: #646cff;
 		}
 	}
 </style>
