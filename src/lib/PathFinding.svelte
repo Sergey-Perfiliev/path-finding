@@ -5,7 +5,7 @@
 	import Dropdown from './Dropdown.svelte'
 	import Node from './Node.svelte'
 
-	let items = ['dijkstra', 'test']
+	let items = ['dijkstra', 'A*']
 	let method = items[0]
 
 	const COLS = 20
@@ -91,8 +91,8 @@
 		style="grid-template-columns: repeat({COLS}, {NODE_WIDTH});"
 	>
 		{#each $gridStore as row}
-			{#each row as node}
-				<Node {...node} />
+			{#each row as { isStart, isEnd, isVisited, isShortest }}
+				<Node {isStart} {isEnd} {isVisited} {isShortest} />
 			{/each}
 		{/each}
 	</div>

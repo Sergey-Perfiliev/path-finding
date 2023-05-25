@@ -1,14 +1,8 @@
 <script>
-	export let col
-	export let row
-
 	export let isStart
 	export let isEnd
 	export let isShortest
 	export let isVisited
-
-	export let distance
-	export let prevNode
 </script>
 
 <div class="node" class:isStart class:isEnd class:isVisited class:isShortest />

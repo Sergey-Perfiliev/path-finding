@@ -1,7 +1,4 @@
-import { gridStore } from '../store/gridStore'
-
 export const dijkstra = (grid, startNode, finishNode) => {
-	console.log(gridStore)
 	// get unvisited nodes
 	const unvisitedNodes = getNodes(grid)
 
