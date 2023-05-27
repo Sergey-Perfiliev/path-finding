@@ -22,3 +22,18 @@ export const setWall = (rowIdx, colIdx) => {
 		return val
 	})
 }
+
+export const clearVisualization = () => {
+	gridStore.update((val) => {
+		for (let row of val) {
+			for (let node of row) {
+				node.isVisited = false
+				node.isShortest = false
+				node.prevNode = null
+				node.distance = Infinity
+			}
+		}
+
+		return val
+	})
+}

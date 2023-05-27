@@ -2,7 +2,7 @@
 	import { clickOutside } from '../utils/clickOutside'
 
 	export let items
-	export let method
+	export let currentAlgorithm
 
 	$: isDropOpen = false
 
@@ -15,7 +15,7 @@
 
 	// drop content item click
 	const setCurrentAlgorithm = (e) => {
-		method = e.target.textContent
+		currentAlgorithm = e.target.textContent
 		closeDropDown()
 	}
 </script>

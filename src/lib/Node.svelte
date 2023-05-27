@@ -51,7 +51,7 @@
 	}
 
 	.isWall {
-		background-color: lightgrey;
+		background-color: lightgrey !important;
 	}
 
 	@keyframes visitedAnimation {

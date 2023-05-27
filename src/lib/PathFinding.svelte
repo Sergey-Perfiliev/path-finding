@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte'
 	import { dijkstra, getPath } from '../algorithms/dijkstra'
 	import {
+		clearVisualization,
 		gridStore,
 		setShortest,
 		setVisited,
@@ -10,8 +11,13 @@
 	import Dropdown from './Dropdown.svelte'
 	import Node from './Node.svelte'
 
-	let items = ['dijkstra', 'A*']
-	let method = items[0]
+	const ALGORITHMS = {
+		DIJKSTRA: 'dijkstra',
+		A_STAR: 'A*',
+	}
+
+	let items = [ALGORITHMS.DIJKSTRA, ALGORITHMS.A_STAR]
+	let currentAlgorithm = items[0]
 
 	const COLS = 20
 	const ROWS = 10
@@ -19,27 +25,44 @@
 	const NODE_WIDTH = '32px'
 	const NODE_HEIGHT = '32px'
 
-	const START_POS = { col: 5, row: 5 }
-	const FINISH_POS = { col: 15, row: 5 }
+	const START_POS = { colIdx: 5, rowIdx: 5 }
+	const FINISH_POS = { colIdx: 15, rowIdx: 5 }
 
 	const visualize = async () => {
-		const startNode = $gridStore[START_POS.row][START_POS.col]
-		const finishNode = $gridStore[FINISH_POS.row][FINISH_POS.col]
+		clearVisualization()
 
-		const visitedNodes = dijkstra($gridStore, startNode, finishNode)
+		const startNode = $gridStore[START_POS.rowIdx][START_POS.colIdx]
+		const finishNode = $gridStore[FINISH_POS.rowIdx][FINISH_POS.colIdx]
+
+		let visitedNodes = new Set()
+
+		switch (currentAlgorithm) {
+			case ALGORITHMS.DIJKSTRA:
+				visitedNodes = dijkstra($gridStore, startNode, finishNode)
+				break
+
+			// TODO: A*
+			// case ALGORITHMS.A_STAR:
+			// 	visitedNodes = aStar($gridStore, startNode, finishNode)
+			// 	break
+
+			default:
+				break
+		}
+
 		for (let node of visitedNodes) {
-			const { row, col } = node
+			const { rowIdx, colIdx } = node
 
 			await new Promise((resolve) => setTimeout(resolve, 20))
-			setVisited(row, col)
+			setVisited(rowIdx, colIdx)
 		}
 
 		const pathNodes = getPath(finishNode)
 		for (let node of pathNodes) {
-			const { row, col } = node
+			const { rowIdx, colIdx } = node
 
 			await new Promise((resolve) => setTimeout(resolve, 20))
-			setShortest(row, col)
+			setShortest(rowIdx, colIdx)
 		}
 	}
 
@@ -53,10 +76,10 @@
 			const row = []
 			for (let colIdx = 0; colIdx < COLS; ++colIdx) {
 				row.push({
-					col: colIdx,
-					row: rowIdx,
-					isStart: colIdx === START_POS.col && rowIdx === START_POS.row,
-					isEnd: colIdx === FINISH_POS.col && rowIdx === FINISH_POS.row,
+					colIdx,
+					rowIdx,
+					isStart: colIdx === START_POS.colIdx && rowIdx === START_POS.rowIdx,
+					isEnd: colIdx === FINISH_POS.colIdx && rowIdx === FINISH_POS.rowIdx,
 					isShortest: false,
 					distance: Infinity,
 					isVisited: false,
@@ -94,45 +117,54 @@
 <header class="header">
 	<h1 class="logo">Path finding</h1>
 	<ul style="margin-right: 1rem;">
-		<Dropdown bind:method {items} />
+		<Dropdown bind:currentAlgorithm {items} />
 	</ul>
 	<div style="display: flex; align-items: center;">
 		<button on:click={visualize} class="primary" style="margin-right: 1rem;"
 			>Find path</button
 		>
-		<button on:click={clearBoard}>clear board</button>
+		<button on:click={clearBoard} style="margin-right: 1rem;"
+			>clear board</button
+		>
+		<button on:click={clearVisualization}>clear visualization</button>
 	</div>
 </header>
 
 <main>
-	<div>
-		Selected algorithm: <b>{method}</b>
+	<div style="display: flex; justify-content: center; padding: 1rem 0 0;">
+		Selected algorithm: <b>{currentAlgorithm}</b>
 	</div>
 	<div
-		class="board"
-		style="grid-template-columns: repeat({COLS}, {NODE_WIDTH});"
+		class="board-wrapper"
+		style="width: 100%; flex: 1 1 auto; display: grid; place-items: center;"
 	>
-		{#each $gridStore as gRow}
-			{#each gRow as { isStart, isEnd, isVisited, isShortest, isWall, row, col }}
-				<Node
-					{isStart}
-					{isEnd}
-					{isVisited}
-					{isShortest}
-					{isWall}
-					{onMouseDown}
-					{onMouseEnter}
-					{onMouseUp}
-					rowIdx={row}
-					colIdx={col}
-				/>
+		<div
+			class="board"
+			style="grid-template-columns: repeat({COLS}, {NODE_WIDTH});"
+		>
+			{#each $gridStore as row}
+				{#each row as { isStart, isEnd, isVisited, isShortest, isWall, rowIdx, colIdx }}
+					<Node
+						{isStart}
+						{isEnd}
+						{isVisited}
+						{isShortest}
+						{isWall}
+						{onMouseDown}
+						{onMouseEnter}
+						{onMouseUp}
+						{rowIdx}
+						{colIdx}
+					/>
+				{/each}
 			{/each}
-		{/each}
+		</div>
 	</div>
 </main>
 
 <style>
 	.header {
+		flex: 0 1 auto;
 		display: flex;
 		padding: 1rem;
 		align-items: center;
@@ -144,8 +176,9 @@
 	}
 
 	main {
-		display: grid;
-		place-items: center;
+		display: flex;
+		flex-flow: column;
+		flex: 1 1 auto;
 	}
 
 	.board {

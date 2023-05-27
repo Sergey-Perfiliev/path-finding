@@ -43,13 +43,13 @@ const getNodes = (grid) => {
 
 // get neighbors of current node
 const getEdges = (grid, node) => {
-	const { row, col } = node
+	const { rowIdx, colIdx } = node
 	const edges = []
 
-	if (row > 0) edges.push(grid[row - 1][col])
-	if (row < grid.length - 1) edges.push(grid[row + 1][col])
-	if (col > 0) edges.push(grid[row][col - 1])
-	if (col < grid[row].length - 1) edges.push(grid[row][col + 1])
+	if (rowIdx > 0) edges.push(grid[rowIdx - 1][colIdx])
+	if (rowIdx < grid.length - 1) edges.push(grid[rowIdx + 1][colIdx])
+	if (colIdx > 0) edges.push(grid[rowIdx][colIdx - 1])
+	if (colIdx < grid[rowIdx].length - 1) edges.push(grid[rowIdx][colIdx + 1])
 
 	return edges
 }
