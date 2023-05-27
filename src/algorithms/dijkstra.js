@@ -23,6 +23,8 @@ export const dijkstra = (grid, startNode, finishNode) => {
 
 		const edges = getEdges(grid, node)
 		for (let edge of edges) {
+			if (edge.isWall) continue
+
 			// should not check visited node twice
 			if (visitedNodes.has(edge)) continue
 

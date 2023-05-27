@@ -1,11 +1,30 @@
 <script>
+	export let rowIdx
+	export let colIdx
+
 	export let isStart
 	export let isEnd
 	export let isShortest
 	export let isVisited
+
+	export let isWall = false
+
+	export let onMouseUp
+	export let onMouseEnter
+	export let onMouseDown
 </script>
 
-<div class="node" class:isStart class:isEnd class:isVisited class:isShortest />
+<div
+	class="node"
+	class:isStart
+	class:isEnd
+	class:isVisited
+	class:isShortest
+	class:isWall
+	on:mousedown={() => onMouseDown(rowIdx, colIdx)}
+	on:mouseenter={() => onMouseEnter(rowIdx, colIdx)}
+	on:mouseup={onMouseUp}
+/>
 
 <style>
 	.node {
@@ -29,6 +48,10 @@
 
 	.isShortest {
 		animation: pathAnimation 1s linear forwards;
+	}
+
+	.isWall {
+		background-color: lightgrey;
 	}
 
 	@keyframes visitedAnimation {

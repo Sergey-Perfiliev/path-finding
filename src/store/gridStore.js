@@ -15,3 +15,10 @@ export const setShortest = (rowIdx, colIdx) => {
 		return val
 	})
 }
+
+export const setWall = (rowIdx, colIdx) => {
+	gridStore.update((val) => {
+		val[rowIdx][colIdx].isWall = !val[rowIdx][colIdx].isWall
+		return val
+	})
+}

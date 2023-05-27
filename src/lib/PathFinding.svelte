@@ -1,7 +1,12 @@
 <script>
 	import { onMount } from 'svelte'
 	import { dijkstra, getPath } from '../algorithms/dijkstra'
-	import { gridStore, setShortest, setVisited } from '../store/gridStore'
+	import {
+		gridStore,
+		setShortest,
+		setVisited,
+		setWall,
+	} from '../store/gridStore'
 	import Dropdown from './Dropdown.svelte'
 	import Node from './Node.svelte'
 
@@ -55,6 +60,7 @@
 					isShortest: false,
 					distance: Infinity,
 					isVisited: false,
+					isWall: false,
 					prevNode: null,
 				})
 			}
@@ -62,6 +68,22 @@
 		}
 
 		$gridStore = gridData
+	}
+
+	let isWallMode = false
+
+	const onMouseEnter = (rowIdx, colIdx) => {
+		if (!isWallMode) return
+		setWall(rowIdx, colIdx)
+	}
+
+	const onMouseDown = (rowIdx, colIdx) => {
+		isWallMode = true
+		setWall(rowIdx, colIdx)
+	}
+
+	const onMouseUp = () => {
+		isWallMode = false
 	}
 
 	onMount(() => {
@@ -90,9 +112,20 @@
 		class="board"
 		style="grid-template-columns: repeat({COLS}, {NODE_WIDTH});"
 	>
-		{#each $gridStore as row}
-			{#each row as { isStart, isEnd, isVisited, isShortest }}
-				<Node {isStart} {isEnd} {isVisited} {isShortest} />
+		{#each $gridStore as gRow}
+			{#each gRow as { isStart, isEnd, isVisited, isShortest, isWall, row, col }}
+				<Node
+					{isStart}
+					{isEnd}
+					{isVisited}
+					{isShortest}
+					{isWall}
+					{onMouseDown}
+					{onMouseEnter}
+					{onMouseUp}
+					rowIdx={row}
+					colIdx={col}
+				/>
 			{/each}
 		{/each}
 	</div>
