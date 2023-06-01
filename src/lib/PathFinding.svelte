@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte'
-	import { dijkstra, getPath } from '../algorithms/dijkstra'
+	import { aStart } from '../algorithms/astar'
+	import { dijkstra } from '../algorithms/dijkstra'
+	import { getPath } from '../algorithms/helpers'
 	import {
 		clearVisualization,
 		gridStore,
@@ -8,7 +10,7 @@
 		setVisited,
 		setWall,
 	} from '../store/gridStore'
-	import Dropdown from './Dropdown.svelte'
+	import Header from './Header.svelte'
 	import Node from './Node.svelte'
 
 	const ALGORITHMS = {
@@ -19,14 +21,14 @@
 	let items = [ALGORITHMS.DIJKSTRA, ALGORITHMS.A_STAR]
 	let currentAlgorithm = items[0]
 
-	const COLS = 20
-	const ROWS = 10
+	const COLS = 41
+	const ROWS = 15
 
 	const NODE_WIDTH = '32px'
 	const NODE_HEIGHT = '32px'
 
-	const START_POS = { colIdx: 5, rowIdx: 5 }
-	const FINISH_POS = { colIdx: 15, rowIdx: 5 }
+	const START_POS = { colIdx: 10, rowIdx: 7 }
+	const FINISH_POS = { colIdx: 30, rowIdx: 7 }
 
 	const visualize = async () => {
 		clearVisualization()
@@ -34,17 +36,16 @@
 		const startNode = $gridStore[START_POS.rowIdx][START_POS.colIdx]
 		const finishNode = $gridStore[FINISH_POS.rowIdx][FINISH_POS.colIdx]
 
-		let visitedNodes = new Set()
+		let visitedNodes = []
 
 		switch (currentAlgorithm) {
 			case ALGORITHMS.DIJKSTRA:
 				visitedNodes = dijkstra($gridStore, startNode, finishNode)
 				break
 
-			// TODO: A*
-			// case ALGORITHMS.A_STAR:
-			// 	visitedNodes = aStar($gridStore, startNode, finishNode)
-			// 	break
+			case ALGORITHMS.A_STAR:
+				visitedNodes = aStart($gridStore, startNode, finishNode)
+				break
 
 			default:
 				break
@@ -53,7 +54,7 @@
 		for (let node of visitedNodes) {
 			const { rowIdx, colIdx } = node
 
-			await new Promise((resolve) => setTimeout(resolve, 20))
+			await new Promise((resolve) => setTimeout(resolve, 10))
 			setVisited(rowIdx, colIdx)
 		}
 
@@ -61,7 +62,7 @@
 		for (let node of pathNodes) {
 			const { rowIdx, colIdx } = node
 
-			await new Promise((resolve) => setTimeout(resolve, 20))
+			await new Promise((resolve) => setTimeout(resolve, 10))
 			setShortest(rowIdx, colIdx)
 		}
 	}
@@ -85,6 +86,10 @@
 					isVisited: false,
 					isWall: false,
 					prevNode: null,
+					// aStar
+					f: Infinity,
+					g: Infinity,
+					h: 0,
 				})
 			}
 			gridData.push(row)
@@ -114,26 +119,18 @@
 	})
 </script>
 
-<header class="header">
-	<h1 class="logo">Path finding</h1>
-	<ul style="margin-right: 1rem;">
-		<Dropdown bind:currentAlgorithm {items} />
-	</ul>
-	<div style="display: flex; align-items: center;">
-		<button on:click={visualize} class="primary" style="margin-right: 1rem;"
-			>Find path</button
-		>
-		<button on:click={clearBoard} style="margin-right: 1rem;"
-			>clear board</button
-		>
-		<button on:click={clearVisualization}>clear visualization</button>
-	</div>
-</header>
+<Header
+	bind:currentAlgorithm
+	{visualize}
+	{clearBoard}
+	{clearVisualization}
+	{items}
+/>
 
 <main>
-	<div style="display: flex; justify-content: center; padding: 1rem 0 0;">
+	<p style="display: flex; justify-content: center; padding: 1rem 0 0;">
 		Selected algorithm: <b>{currentAlgorithm}</b>
-	</div>
+	</p>
 	<div
 		class="board-wrapper"
 		style="width: 100%; flex: 1 1 auto; display: grid; place-items: center;"
@@ -163,18 +160,6 @@
 </main>
 
 <style>
-	.header {
-		flex: 0 1 auto;
-		display: flex;
-		padding: 1rem;
-		align-items: center;
-	}
-
-	.logo {
-		font-size: 2rem;
-		margin-right: 1rem;
-	}
-
 	main {
 		display: flex;
 		flex-flow: column;
@@ -183,19 +168,5 @@
 
 	.board {
 		display: grid;
-	}
-
-	ul {
-		list-style-type: none;
-		margin: 0;
-		padding: 0;
-		overflow: hidden;
-		background-color: #1a1a1a;
-		border-radius: 8px;
-	}
-
-	.primary {
-		color: #242424;
-		background-color: #a3c7fa !important;
 	}
 </style>

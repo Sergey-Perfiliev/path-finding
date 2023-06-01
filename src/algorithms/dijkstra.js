@@ -1,3 +1,5 @@
+import { getEdges, getNodes } from './helpers'
+
 export const dijkstra = (grid, startNode, finishNode) => {
 	// get unvisited nodes
 	const unvisitedNodes = getNodes(grid)
@@ -6,6 +8,7 @@ export const dijkstra = (grid, startNode, finishNode) => {
 	// Infinity -> 0
 	startNode.distance = 0
 
+	// set to track all visited nodes
 	const visitedNodes = new Set()
 
 	// visit all unvisited nodes
@@ -13,13 +16,13 @@ export const dijkstra = (grid, startNode, finishNode) => {
 		const node = getNodeWithMinDistance(unvisitedNodes, visitedNodes)
 
 		// no nodes to visit
-		if (node.distance === Infinity) return visitedNodes
+		if (node.distance === Infinity) return Array.from(visitedNodes)
 
 		// mark as visited
 		visitedNodes.add(node)
 
 		// find finish node
-		if (node === finishNode) return visitedNodes
+		if (node === finishNode) return Array.from(visitedNodes)
 
 		const edges = getEdges(grid, node)
 		for (let edge of edges) {
@@ -33,38 +36,6 @@ export const dijkstra = (grid, startNode, finishNode) => {
 			edge.prevNode = node
 		}
 	}
-}
-
-// reconfigure grid
-// from 2d array to 1d array
-const getNodes = (grid) => {
-	return [].concat(...grid)
-}
-
-// get neighbors of current node
-const getEdges = (grid, node) => {
-	const { rowIdx, colIdx } = node
-	const edges = []
-
-	if (rowIdx > 0) edges.push(grid[rowIdx - 1][colIdx])
-	if (rowIdx < grid.length - 1) edges.push(grid[rowIdx + 1][colIdx])
-	if (colIdx > 0) edges.push(grid[rowIdx][colIdx - 1])
-	if (colIdx < grid[rowIdx].length - 1) edges.push(grid[rowIdx][colIdx + 1])
-
-	return edges
-}
-
-// return path from start to finish node
-export const getPath = (finishNode) => {
-	const pathNodes = []
-	let currNode = finishNode
-
-	while (currNode !== null) {
-		pathNodes.unshift(currNode)
-		currNode = currNode.prevNode
-	}
-
-	return pathNodes
 }
 
 // get node with minimum distance from unvisited array
