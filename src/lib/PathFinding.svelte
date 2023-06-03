@@ -5,10 +5,13 @@
 	import { getPath } from '../algorithms/helpers'
 	import {
 		clearVisualization,
+		getFinishNode,
+		getStartNode,
 		gridStore,
 		setShortest,
 		setVisited,
 		setWall,
+		updateBoundaryNodePosition,
 	} from '../store/gridStore'
 	import Header from './Header.svelte'
 	import Node from './Node.svelte'
@@ -30,11 +33,15 @@
 	const START_POS = { colIdx: 10, rowIdx: 7 }
 	const FINISH_POS = { colIdx: 30, rowIdx: 7 }
 
+	const timeout = async (ms) => {
+		await new Promise((resolve) => setTimeout(resolve, ms))
+	}
+
 	const visualize = async () => {
 		clearVisualization()
 
-		const startNode = $gridStore[START_POS.rowIdx][START_POS.colIdx]
-		const finishNode = $gridStore[FINISH_POS.rowIdx][FINISH_POS.colIdx]
+		const startNode = getStartNode()
+		const finishNode = getFinishNode()
 
 		let visitedNodes = []
 
@@ -54,7 +61,7 @@
 		for (let node of visitedNodes) {
 			const { rowIdx, colIdx } = node
 
-			await new Promise((resolve) => setTimeout(resolve, 10))
+			await timeout(10)
 			setVisited(rowIdx, colIdx)
 		}
 
@@ -62,7 +69,7 @@
 		for (let node of pathNodes) {
 			const { rowIdx, colIdx } = node
 
-			await new Promise((resolve) => setTimeout(resolve, 10))
+			await timeout(50)
 			setShortest(rowIdx, colIdx)
 		}
 	}
@@ -100,18 +107,62 @@
 
 	let isWallMode = false
 
-	const onMouseEnter = (rowIdx, colIdx) => {
+	const onMouseEnter = (node) => {
+		const { rowIdx, colIdx, isStart, isEnd } = node
+
 		if (!isWallMode) return
+
 		setWall(rowIdx, colIdx)
 	}
 
-	const onMouseDown = (rowIdx, colIdx) => {
+	const onMouseDown = (node) => {
+		const { rowIdx, colIdx, isStart, isEnd } = node
+
+		if (isStart || isEnd) return
+
 		isWallMode = true
 		setWall(rowIdx, colIdx)
 	}
 
 	const onMouseUp = () => {
 		isWallMode = false
+	}
+
+	let dragInfo = {
+		mode: false,
+		position: null,
+		boundaryNode: null,
+		targetNode: null,
+	}
+
+	const onDragMouseDown = (node) => {
+		const { isStart, isEnd } = node
+
+		if (!isStart && !isEnd) return
+
+		dragInfo = {
+			...dragInfo,
+			position: isStart ? 'isStart' : 'isEnd',
+			mode: true,
+			boundaryNode: node,
+		}
+	}
+
+	const onDragMouseUp = (node) => {
+		if (!dragInfo.mode) return
+
+		dragInfo = {
+			...dragInfo,
+			mode: true,
+			targetNode: node,
+		}
+
+		updateBoundaryNodePosition(
+			dragInfo.boundaryNode,
+			dragInfo.targetNode,
+			dragInfo.position
+		)
+		clearVisualization()
 	}
 
 	onMount(() => {
@@ -127,7 +178,12 @@
 	{items}
 />
 
-<main>
+<main
+	on:mouseup={() => {
+		isWallMode = false
+		dragInfo.mode = false
+	}}
+>
 	<p style="display: flex; justify-content: center; padding: 1rem 0 0;">
 		Selected algorithm: <b>{currentAlgorithm}</b>
 	</p>
@@ -152,6 +208,8 @@
 						{onMouseUp}
 						{rowIdx}
 						{colIdx}
+						{onDragMouseDown}
+						{onDragMouseUp}
 					/>
 				{/each}
 			{/each}

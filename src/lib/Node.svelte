@@ -1,7 +1,4 @@
 <script>
-	export let rowIdx
-	export let colIdx
-
 	export let isStart
 	export let isEnd
 	export let isShortest
@@ -12,6 +9,9 @@
 	export let onMouseUp
 	export let onMouseEnter
 	export let onMouseDown
+
+	export let onDragMouseDown
+	export let onDragMouseUp
 </script>
 
 <div
@@ -21,9 +21,11 @@
 	class:isVisited
 	class:isShortest
 	class:isWall
-	on:mousedown={() => onMouseDown(rowIdx, colIdx)}
-	on:mouseenter={() => onMouseEnter(rowIdx, colIdx)}
-	on:mouseup={onMouseUp}
+	on:mouseup={() => onMouseUp($$props)}
+	on:mousedown={() => onMouseDown($$props)}
+	on:mouseenter={() => onMouseEnter($$props)}
+	on:mouseup={() => onDragMouseUp($$props)}
+	on:mousedown={() => onDragMouseDown($$props)}
 />
 
 <style>

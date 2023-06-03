@@ -37,3 +37,35 @@ export const clearVisualization = () => {
 		return val
 	})
 }
+
+export const getStoreVal = () => {
+	let val
+	gridStore.subscribe(($) => (val = $))
+	return val || []
+}
+
+export const getStartNode = () => {
+	for (let row of getStoreVal()) {
+		for (let node of row) {
+			if (!node.isStart) continue
+			return node
+		}
+	}
+}
+
+export const getFinishNode = () => {
+	for (let row of getStoreVal()) {
+		for (let node of row) {
+			if (!node.isEnd) continue
+			return node
+		}
+	}
+}
+
+export const updateBoundaryNodePosition = (startNode, targetNode, position) => {
+	gridStore.update((val) => {
+		val[startNode.rowIdx][startNode.colIdx][position] = false
+		val[targetNode.rowIdx][targetNode.colIdx][position] = true
+		return val
+	})
+}
