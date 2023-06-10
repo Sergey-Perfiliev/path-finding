@@ -4,7 +4,7 @@
 	export let items
 	export let currentAlgorithm
 
-	$: isDropOpen = false
+	let isDropOpen = false
 
 	const toggleDropDown = () => {
 		isDropOpen = !isDropOpen

@@ -108,7 +108,7 @@
 	let isWallMode = false
 
 	const onMouseEnter = (node) => {
-		const { rowIdx, colIdx, isStart, isEnd } = node
+		const { rowIdx, colIdx } = node
 
 		if (!isWallMode) return
 
@@ -196,18 +196,12 @@
 			style="grid-template-columns: repeat({COLS}, {NODE_WIDTH});"
 		>
 			{#each $gridStore as row}
-				{#each row as { isStart, isEnd, isVisited, isShortest, isWall, rowIdx, colIdx }}
+				{#each row as node (node)}
 					<Node
-						{isStart}
-						{isEnd}
-						{isVisited}
-						{isShortest}
-						{isWall}
+						{...node}
 						{onMouseDown}
 						{onMouseEnter}
 						{onMouseUp}
-						{rowIdx}
-						{colIdx}
 						{onDragMouseDown}
 						{onDragMouseUp}
 					/>

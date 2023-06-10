@@ -1,6 +1,7 @@
 import { getEdges } from './helpers'
 
 export const aStart = (grid, startNode, finishNode) => {
+	// update start node
 	startNode.g = 0
 	startNode.f = 0
 
@@ -10,11 +11,15 @@ export const aStart = (grid, startNode, finishNode) => {
 	while (openSet.length > 0) {
 		const [node, lowestIdx] = getClosesNode(openSet)
 
+		// find the result
 		if (node === finishNode) return closedSet
 
+		// remove closest node from open set and
 		openSet.splice(lowestIdx, 1)
+		// add to closed set
 		closedSet.push(node)
 
+		// update edges
 		const edges = getEdges(grid, node)
 		for (let edge of edges) {
 			if (edge.isWall) continue
@@ -28,6 +33,7 @@ export const aStart = (grid, startNode, finishNode) => {
 				continue
 			}
 
+			// update edge nodes
 			edge.g = g
 			edge.h = getHeuristicDistance(edge, finishNode)
 			edge.f = edge.g + edge.h
@@ -38,6 +44,7 @@ export const aStart = (grid, startNode, finishNode) => {
 	return closedSet
 }
 
+// get closest node from openSet
 const getClosesNode = (openSet) => {
 	let lowestIdx = 0
 
