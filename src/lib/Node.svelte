@@ -12,6 +12,9 @@
 
 	export let onDragMouseDown
 	export let onDragMouseUp
+
+	export let width = 24
+	export let height = 24
 </script>
 
 <div
@@ -26,14 +29,15 @@
 	on:mouseenter={() => onMouseEnter($$props)}
 	on:mouseup={() => onDragMouseUp($$props)}
 	on:mousedown={() => onDragMouseDown($$props)}
+	style="width: {width}px; height: {height}px"
 />
 
 <style>
 	.node {
 		display: block;
-		width: 32px;
-		height: 32px;
-		border: 1px solid #ffffff;
+		box-shadow: 0 0 0 2px var(--border-color);
+		border: none;
+		outline: none;
 	}
 
 	.node.isStart {
@@ -58,11 +62,11 @@
 
 	@keyframes visitedAnimation {
 		from {
-			background-color: #646cff;
+			background-color: var(--color-primary);
 		}
 
 		to {
-			background-color: #a3c7fa;
+			background-color: var(--color-secondary);
 		}
 	}
 
@@ -72,7 +76,7 @@
 		}
 
 		to {
-			background-color: #646cff;
+			background-color: var(--color-primary);
 		}
 	}
 </style>

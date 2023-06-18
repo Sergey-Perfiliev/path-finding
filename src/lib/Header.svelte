@@ -1,5 +1,10 @@
 <script>
+	import { themeStore, toggleTheme } from '../store/themeStore'
 	import Dropdown from './Dropdown.svelte'
+
+	$: {
+		document.documentElement.setAttribute('data-theme', $themeStore)
+	}
 
 	export let currentAlgorithm
 	export let items
@@ -8,46 +13,87 @@
 	export let clearVisualization
 </script>
 
-<header class="header">
-	<h1 class="logo">Path finding</h1>
-	<ul style="margin-right: 1rem;">
-		<Dropdown bind:currentAlgorithm {items} />
-	</ul>
-	<div style="display: flex; align-items: center;">
-		<button on:click={visualize} class="primary" style="margin-right: 1rem;"
-			>Find path</button
-		>
-		<button on:click={clearBoard} style="margin-right: 1rem;"
-			>clear board</button
-		>
-		<button on:click={clearVisualization}>clear visualization</button>
-	</div>
-</header>
+<div class="header__wrapper">
+	<header class="header">
+		<h1 class="header__logo">Path finding</h1>
+		<ul class="header__algo-list">
+			<Dropdown bind:currentAlgorithm {items} />
+		</ul>
+		<div class="header__buttons">
+			<button on:click={visualize} class="button button--primary"
+				>Find path</button
+			>
+			<button class="button button--secondary" on:click={clearBoard}
+				>clear board</button
+			>
+			<button class="button button--secondary" on:click={clearVisualization}
+				>clear visualization</button
+			>
+			<button class="button button--theme" on:click={toggleTheme}>
+				{$themeStore === 'dark' ? 'light' : 'dark'}
+			</button>
+		</div>
+	</header>
+</div>
 
-<style>
-	.header {
-		flex: 0 1 auto;
+<style lang="scss">
+	.header__wrapper {
+		position: relative;
+
 		display: flex;
+		flex: 0 1 auto;
 		padding: 1rem;
+	}
+
+	.header {
+		display: flex;
 		align-items: center;
+		margin: 0 auto;
+
+		& > *:not(:last-child) {
+			margin-right: 1rem;
+		}
+
+		&__algo-list {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+			background-color: var(--bg-color-secondary);
+			border-radius: 8px;
+		}
+
+		&__logo {
+			position: absolute;
+			left: 2rem;
+			font-size: 2rem;
+			color: var(--font-color);
+		}
 	}
 
-	.logo {
-		font-size: 2rem;
-		margin-right: 1rem;
+	.header__buttons {
+		display: flex;
+		align-items: center;
+
+		& > *:not(:last-child) {
+			margin-right: 1rem;
+		}
 	}
 
-	ul {
-		list-style-type: none;
-		margin: 0;
-		padding: 0;
-		overflow: hidden;
-		background-color: #1a1a1a;
-		border-radius: 8px;
-	}
+	.button {
+		&--primary {
+			color: var(--color-dark);
+			background-color: var(--color-secondary);
+		}
 
-	.primary {
-		color: #242424;
-		background-color: #a3c7fa !important;
+		&--secondary {
+			color: var(--font-color-secondary);
+			background-color: var(--bg-color-secondary);
+		}
+
+		&--theme {
+			width: 100px;
+			color: var(--color-theme);
+		}
 	}
 </style>

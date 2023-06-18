@@ -27,8 +27,8 @@
 	const COLS = 41
 	const ROWS = 15
 
-	const NODE_WIDTH = '32px'
-	const NODE_HEIGHT = '32px'
+	const NODE_WIDTH = '24px'
+	const NODE_HEIGHT = '24px'
 
 	const START_POS = { colIdx: 10, rowIdx: 7 }
 	const FINISH_POS = { colIdx: 30, rowIdx: 7 }
@@ -184,18 +184,15 @@
 		dragInfo.mode = false
 	}}
 >
-	<p style="display: flex; justify-content: center; padding: 1rem 0 0;">
+	<p class="selected-algorithm">
 		Selected algorithm: <b>{currentAlgorithm}</b>
 	</p>
-	<div
-		class="board-wrapper"
-		style="width: 100%; flex: 1 1 auto; display: grid; place-items: center;"
-	>
+	<div class="board-wrapper">
 		<div
 			class="board"
 			style="grid-template-columns: repeat({COLS}, {NODE_WIDTH});"
 		>
-			{#each $gridStore as row}
+			{#each $gridStore as row (row)}
 				{#each row as node (node)}
 					<Node
 						{...node}
@@ -218,7 +215,22 @@
 		flex: 1 1 auto;
 	}
 
+	.selected-algorithm {
+		display: flex;
+		color: var(--font-color);
+		justify-content: center;
+		padding: 1rem 0 0;
+	}
+
+	.board-wrapper {
+		width: 100%;
+		flex: 1 1 auto;
+		display: grid;
+		place-items: center;
+	}
+
 	.board {
 		display: grid;
+		grid-gap: 2px;
 	}
 </style>
