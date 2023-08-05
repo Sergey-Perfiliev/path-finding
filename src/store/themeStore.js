@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store'
 
-export const themeStore = writable('light')
+export const themeStore = writable('dark')
 
 export const toggleTheme = () => {
 	themeStore.update((currentTheme) =>
